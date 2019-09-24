@@ -95,6 +95,7 @@
             // only proceed once promise is resolved
             let rows = await response.json();
             this.rows = rows;
+            this.getAllIdReports();
           },
           getAllIdReports: async function (string) {
             // await response of fetch call
