@@ -1,0 +1,29 @@
+apps:
+  name     : 'api-koa'
+  script   : ./app.js
+  instances: 1
+  exec_mode: cluster
+  autorestart: true
+  watch: true
+  restart_delay: 10000
+
+  env:
+    NODE_ENV: development
+    NODE_PORT: 3232
+
+    DB_HOST: host
+
+    DB_PORT: 5432
+    DB_NAME: dbname
+    DB_USERNAME: postgres
+    DB_PASSWORD: postgres
+
+    FEDEX_KEY: jfjwKS65xft8r8mh
+    FEDEX_PASSWORD: QYrbniTyMafyj4LXm4tV7nsq5
+    FEDEX_ACCOUNT: 802388543
+    FEDEX_METER: 119147906
+    FEDEX_DEMO: false
+    
+    DB_MAX: 100
+    DB_IDLE_TIMEOUT: 7000
+    DB_CONNECTION_TIMEOUT: 7000

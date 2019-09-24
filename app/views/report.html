@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17/vue.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/normalize.css">
+  <link rel="stylesheet" href="/css/report.css">
+  <title>Reporte de Sobrepeso</title>
+</head>
+<body>
+  <div id="app">
+    
+    <div class="form">
+
+      <input type="file" id="files" name="files" accept="application/json, .json" />
+      <div class="btn" v-on:click="send">Enviar</div>
+
+      <div class="dropdown">
+          <button class="dropbtn">Ver reporte</button>
+          <div class="dropdown-content">
+            <a href="#" v-for="row in ids.data" v-on:click="get(row.id)">Reporte {{row.id}}</a>
+          </div>
+        </div>
+      
+    </div>
+
+    <table>
+      <caption>Reporte de Sobrepeso</caption>
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Peso</th>
+          <th scope="col">Peso volumétrico</th>
+          <th scope="col">Peso total</th>
+          <th scope="col">Peso real</th>
+          <th scope="col">Peso real volumétrico</th>
+          <th scope="col">Peso real total</th>
+          <th scope="col">Sobrepeso</th>
+          <th scope="col">Diferencia de peso</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="row in rows.data"  :class="{ 'underweight' : !row.overweight}">
+          <td data-label="1">{{ row.trackId }}</td>
+          <td data-label="2">{{ row.weight }}</td>
+          <td data-label="3">{{ row.dimensionalWeight }}</td>
+          <td data-label="4">{{ row.totalWeight }}</td>
+          <td data-label="5">{{ row.realWeight }}</td>
+          <td data-label="6">{{ row.realDimensionalWeight }}</td>
+          <td data-label="7">{{ row.realTotalWeight }}</td>
+          <td data-label="8":class="{ 'overweight' : row.overweight}" >{{ row.overweight ? "SI" : "NO" }}</td>
+          <td data-label="9">{{ row.overweightDifference }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      var json;
+      var app = new Vue({
+        el: '#app',
+        data: {
+          rows:[],
+          ids:{}
+        },
+
+        created: function () {
+          this.getAllIdReports();
+        },
+
+        methods: {
+          getReport: async function (string) {
+            // await response of fetch call
+            let response = await fetch('/v1/report' + "?id=" + string);
+            // only proceed once promise is resolved
+            let rows = await response.json();
+            this.rows = rows;
+          },
+          postReport: async function (string) {
+            // await response of fetch call
+            let response = await fetch('/v1/report',{
+              method: 'POST',
+              headers: {
+               'Accept': 'application/json',
+               'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({json})
+            });
+            // only proceed once promise is resolved
+            let rows = await response.json();
+            this.rows = rows;
+          },
+          getAllIdReports: async function (string) {
+            // await response of fetch call
+            let response = await fetch('/v1/report');
+            // only proceed once promise is resolved
+            let rows = await response.json();
+            this.ids = rows;
+          },
+          send: function (event) {
+            this.postReport();
+          },
+          get: function (id) {
+            console.log(id);
+            this.getReport(id);
+          }
+        }
+
+      });
+      
+      const fr = new FileReader();
+      fr.onload = e => writeInfo(e.target.result);
+
+      function writeInfo(data) {
+        json = data;
+      };
+  
+      document.getElementById('files').addEventListener('change', e => {
+        fr.readAsText(e.target.files[0]);
+      }, false);
+
+    });  
+
+  </script>
+
+</body>
+</html>
